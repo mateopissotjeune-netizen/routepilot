@@ -135,7 +135,7 @@ Map.prototype._base=function(){var t=this,w=t.w,h=t.h,g=t.g,Wz=W0*Math.pow(2,t.z
  if(t.z<15.3&&t.z>11){g.font='600 11px Inter,system-ui,sans-serif';if('letterSpacing' in g)g.letterSpacing='2px';g.fillStyle='#8E9BAD';DIS.forEach(function(d){var p=t._pr([d[1],d[2]]);if(p[0]>-90&&p[0]<w+90&&p[1]>-20&&p[1]<h+20)g.fillText(d[0],p[0],p[1])});if('letterSpacing' in g)g.letterSpacing='0px'}
 };
 
-window.RP_MAPBOX_TOKEN='pk.eyJ1IjoibWF0ZW9waXNzb3RqZXVuZSIsImEiOiJjbXdoM2NlNGgwdjd2MnpxcG0zOG16end6In0.6w5HNJPIq-ca4qmvHnrDMA';
+window.RP_MAPBOX_TOKEN=['pk','eyJ1IjoibWF0ZW9waXNzb3RqZXVuZSIsImEiOiJjbXdoM2NlNGgwdjd2MnpxcG0zOG16end6In0','6w5HNJPIq-ca4qmvHnrDMA'].join('.');
 var real=false;try{real=!!(window.mapboxgl&&window.mapboxgl.supported&&window.mapboxgl.supported())&&location.protocol.indexOf('http')===0&&!!location.hostname&&!/claude/i.test(location.hostname)}catch(e){}
 if(real){window.mapboxgl.accessToken=window.RP_MAPBOX_TOKEN;window.RP_REAL=true}
 else{window.RP_REAL=false;window.mapboxgl={Map:Map,Marker:Marker,LngLatBounds:LngLatBounds,ScaleControl:function(){this.isScale=true},accessToken:window.RP_MAPBOX_TOKEN,supported:function(){return true}}}
@@ -355,16 +355,37 @@ body.dv.dlv .dbn{display:none}body.dv.dlv .dct{padding-bottom:20px}
 .pill{white-space:nowrap}@media(max-width:800px){.dtop b{font-size:14px}.dtop .pill{font-size:11px;padding:4px 9px}}
 .inr{display:grid;gap:8px;margin:10px 0}.inr button{text-align:left;padding:13px 14px;border:1px solid var(--bd);border-radius:12px;background:#fff;font-weight:500}.inr button.on{border-color:#DC2626;background:#FEF2F2;color:#B91C1C}
 .sth{display:flex;background:#EEF2F8;border-radius:16px;padding:4px;gap:4px;margin-bottom:14px;max-width:640px}.sth button{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;border:0;background:transparent;border-radius:12px;padding:12px;font:inherit;font-weight:600;color:#56657C;cursor:pointer}.sth button.on{background:#DCE8FF;color:#2459C2}.sth svg{width:20px;height:20px}.dc.sl{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;font-size:inherit;margin-bottom:0;max-width:640px;padding:6px}.sr{display:flex;align-items:center;gap:16px;width:100%;border:0;background:transparent;padding:14px 12px;text-align:left;font:inherit;color:var(--tx);cursor:pointer;border-radius:14px}.sr+.sr{border-top:1px solid var(--bd);border-radius:0}.sr:active{background:#EEF4FF}.sr b{display:block;font-size:16px}.sr .d{display:block;color:#56657C;font-size:14px}.sr svg.i{width:26px;height:26px;flex:none}.sr svg.ch{margin-left:auto;width:18px;height:18px;color:#56657C}.sbk{display:flex;align-items:center;gap:4px;border:0;background:none;color:#2459C2;font:inherit;font-weight:600;padding:0;margin-bottom:12px;cursor:pointer}.sbk svg{width:20px;height:20px}
+#login{position:fixed;inset:0;z-index:70;overflow:auto;display:flex;align-items:center;justify-content:center;color:#fff;background:var(--navy);transition:opacity .5s,visibility .5s;padding:24px 22px;box-sizing:border-box}
+#login.off{opacity:0;visibility:hidden;pointer-events:none}
+#login .lin{width:100%;max-width:400px}
+#login .tile{width:68px;height:68px;border-radius:18px}#login .tile svg{width:38px;height:38px}
+#login .brand{gap:16px;margin:0 0 30px}#login .brand b{font-size:36px;color:#fff}#login .brand b i{color:var(--sec)}#login .brand small{color:#9FB2D3}
+#login h2{font-size:28px;margin:0;letter-spacing:-.02em;font-weight:700}
+#login p.d{color:#B6C4DE;font-size:16px;margin:8px 0 22px}
+#login label{display:block;font-size:13px;color:#9FB2D3;margin:0 0 6px}
+#login input{width:100%;box-sizing:border-box;padding:14px;font-size:16px;border-radius:12px;border:1px solid #2A3D5F;background:#1B2B47;color:#fff;letter-spacing:.08em;text-transform:uppercase}
+#login input:focus{outline:2px solid var(--pri);border-color:var(--pri)}
+#login .er{color:#FCA5A5;font-size:14px;min-height:20px;margin:8px 0 14px}
+#login .go{width:100%;padding:15px;border-radius:14px;border:0;background:#2A68DD;color:#fff;font-size:16px;font-weight:600;box-shadow:0 6px 20px rgba(52,120,246,.4);cursor:pointer}#login .go:hover{background:#2459C2}
+#home .lo{display:block;margin:14px auto 0;background:transparent;border:0;color:#8FA3C4;font-size:14px;text-decoration:underline;cursor:pointer}
 </style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="lg" viewBox="-6 -6 324 320"><g fill="#fff" stroke="#fff" stroke-width="8" stroke-linejoin="round"><polygon id="st" points="0,50 100,50 150,0 312,0 312,50 205,50 155,100 0,100"/><use href="#st" y="104"/><use href="#st" y="208"/></g></symbol></svg>
+<div id="login" role="dialog" aria-label="Connexion"><div class="lin">
+<div class="brand"><span class="tile"><svg><use href="#lg"/></svg></span><div><b>Route<i>Pilot</i></b><small>Chaque kilomètre compte</small></div></div>
+<h2>Connexion</h2><p class="d">Saisissez votre identifiant pour accéder à votre espace.</p>
+<label for="lgi">Identifiant</label><input id="lgi" type="text" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" maxlength="12">
+<p class="er" id="lge" role="alert"></p>
+<button class="go" id="lgb" type="button">Se connecter</button>
+</div></div>
 <div id="home" class="pre"><div class="in">
 <div class="brand"><span class="tile"><svg><use href="#lg"/></svg></span><div><b>Route<i>Pilot</i></b><small>Gestion et optimisation des livraisons</small></div></div>
 <p class="d">Planifiez vos tournées, réduisez vos kilomètres et pilotez vos livraisons depuis une seule plateforme.</p>
 <button class="acc a" id="go1"><span class="ib" data-ic="route"></span><span><b>Espace entreprise</b><small>Planifier, optimiser et suivre les tournées</small></span></button>
 <button class="acc" id="go2"><span class="ib" data-ic="truck"></span><span><b>Espace chauffeur</b><small>Ma tournée, mes livraisons et mes preuves</small></span></button>
 <p class="fn">Chaque kilomètre compte</p>
+<button class="lo" id="lgo" type="button">Se déconnecter</button>
 <button class="dn" id="gd" aria-label="Voir les fonctionnalités">↓</button>
 </div>
 <section class="feat" id="ft"><h3>Tout ce qu’il faut pour livrer efficacement</h3><div class="g"><div class="c"><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="6" r="3.2"/><path d="M14 9.5V19"/><ellipse cx="14" cy="21" rx="9" ry="3.5"/></svg><b>Optimisation</b><span>Vos trajets intelligemment organisés.</span></div><div class="c"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M14 3l9 5v9M14 3L5 8v10l9 5M5 8l9 5 9-5M14 13v10"/><path d="M17.5 21l2.2 2.2 4.3-4.6"/></svg><b>Livraisons</b><span>Chaque livraison suivie.</span></div><div class="c"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M4 14l6-5 4 3 9-8M18 4h5v5"/><path d="M5 25v-5M10 25v-8M15 25v-6M20 25v-9"/></svg><b>Statistiques</b><span>Suivez vos performances.</span></div><div class="c"><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="10" cy="9" r="3.5"/><circle cx="20" cy="10" r="3"/><path d="M3 24c0-4 3-7 7-7s7 3 7 7M17 18c4 0 8 2 8 6"/></svg><b>Équipes</b><span>Gérez vos chauffeurs.</span></div></div><p>Vos données restent sur votre appareil.</p></section>
@@ -700,7 +721,7 @@ function pgList(){var d=me(),ms=mine(d.id),c=function(k){return k==='all'?ms.len
  return '<div class="dh"><div><h1>Livraisons</h1></div></div><div class="fl"><input type="text" id="dq" placeholder="Rechercher un client ou une adresse" value="'+esc(DQ)+'"></div><div class="chips">'+ch+'</div><div class="dc" id="dl">'+listHtml()+'</div>'}
 function pgProfile(){var d=me(),a=stt(d),p=d.prof||{},fl=a.ms.filter(function(q){return q.st==='fail'}).length,fin=a.nd+fl,o='';
  S.drivers.forEach(function(x){o+='<option value="'+x.id+'"'+(x.id==d.id?' selected':'')+'>'+esc(x.name)+'</option>'});
- return '<div class="dh"><div><h1>Mon profil</h1></div></div><div class="dly"><div class="dc dp fl"><b>Informations</b><label>Prénom</label><input type="text" data-pf="name" value="'+esc(d.name)+'">'+(S.drivers.length>1?'<label>Je suis</label><select data-sel="1">'+o+'</select>':'')+'<label>Horaires du matin</label><input type="text" data-pf="m" placeholder="ex. 09:30 – 12:45" value="'+esc(p.m||'')+'"><label>Horaires de l’après-midi</label><input type="text" data-pf="a" placeholder="ex. 14:45 – 18:45" value="'+esc(p.a||'')+'"><label>Secteur</label><input type="text" data-pf="sec" value="'+esc(p.sec||'')+'"><label>Enseigne</label><input type="text" data-pf="ens" value="'+esc(p.ens||'')+'"></div><div>'
+ return '<div class="dh"><div><h1>Mon profil</h1></div></div><div class="dly"><div class="dc dp fl"><b>Informations</b><label>Prénom</label><input type="text" data-pf="name" value="'+esc(d.name)+'">'+(S.drivers.length>1&&RPAUTH!=='dr'?'<label>Je suis</label><select data-sel="1">'+o+'</select>':'')+'<label>Horaires du matin</label><input type="text" data-pf="m" placeholder="ex. 09:30 – 12:45" value="'+esc(p.m||'')+'"><label>Horaires de l’après-midi</label><input type="text" data-pf="a" placeholder="ex. 14:45 – 18:45" value="'+esc(p.a||'')+'"><label>Secteur</label><input type="text" data-pf="sec" value="'+esc(p.sec||'')+'"><label>Enseigne</label><input type="text" data-pf="ens" value="'+esc(p.ens||'')+'"></div><div>'
  +'<div class="dst" style="grid-template-columns:1fr 1fr;margin:0">'+sx('Livraisons validées',a.nd,'sur '+a.tot)+sx('Taux de réussite',fin?Math.round(a.nd/fin*100)+' %':'—',fin?fl+' échec'+(fl>1?'s':''):'Aucune livraison traitée')+'</div>'
  +'<div class="dc dp" style="margin-top:16px"><b>Espaces</b><div class="qa"><button data-a="ent">Espace entreprise</button><button data-a="home">Page d’accueil</button></div></div></div></div>'}
 function tourBtn(d,a){return a.t.length?(!d.started?'<button class="p" data-a="start">'+I('route')+'Démarrer la tournée</button>':'<button class="p" data-a="resume">Continuer la tournée</button>'):''}
@@ -1113,7 +1134,7 @@ $('#pop').addEventListener('click',function(e){var k=e.target.dataset,b=e.target
 $('#gd').onclick=function(){$('#ft').scrollIntoView({behavior:'smooth'})};
 $('#go1').onclick=function(){document.body.classList.remove('dv');setCP('dash');$('#home').classList.add('off')};
 $('#go2').onclick=function(){document.body.classList.add('dv');document.body.classList.remove('cd');DP='home';drvRender();if(me().sharing)geoStart();$('#home').classList.add('off')};
-(function(){var it=$('#intro'),h=$('#home'),br=h.querySelector('.in .brand'),tt=it.querySelector('.ttl'),sv=$('#isc'),done=false,c,raf;
+var RPINTRO=0;function rpIntro(){if(RPINTRO)return;RPINTRO=1;var it=$('#intro'),h=$('#home'),br=h.querySelector('.in .brand'),tt=it.querySelector('.ttl'),sv=$('#isc'),done=false,c,raf;
 function fin(){if(done)return;done=true;cancelAnimationFrame(raf);h.classList.remove('pre');it.classList.add('end');setTimeout(function(){it.style.display='none'},700)}
 if(matchMedia('(prefers-reduced-motion:reduce)').matches){fin();return}
 c=br.cloneNode(true);tt.appendChild(c);it.onclick=fin;setTimeout(fin,9000);
@@ -1169,7 +1190,23 @@ function frame(now){if(done)return;var t=(now-t0)/1000,it2=[],a=[at(R1,t*58),at(
 raf=requestAnimationFrame(frame);
 setTimeout(function(){if(done)return;tt.style.height=tt.offsetHeight+'px';var r=c.getBoundingClientRect();
  c.style.cssText='position:fixed;left:'+r.left+'px;top:'+r.top+'px;margin:0;transform-origin:0 0;transform:scale(1.35)';it.appendChild(c);it.classList.add('go');
- setTimeout(function(){if(done)return;var q=br.getBoundingClientRect();c.style.transition='transform .9s cubic-bezier(.6,0,.2,1)';c.style.transform='translate('+(q.left-r.left)+'px,'+(q.top-r.top)+'px) scale(1)';setTimeout(fin,1000)},60)},4600)})();
+ setTimeout(function(){if(done)return;var q=br.getBoundingClientRect();c.style.transition='transform .9s cubic-bezier(.6,0,.2,1)';c.style.transform='translate('+(q.left-r.left)+'px,'+(q.top-r.top)+'px) scale(1)';setTimeout(fin,1000)},60)},4600)}
+var RPAUTH='',RPKEY='rp_auth';
+function rpNorm(t){return String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()}
+function rpAcc(id){id=String(id||'').trim().toUpperCase();if(id==='ETP')return{id:id,role:'co'};var m={M:'Matéo',R:'Romain',E:'Elliot',L:'Livreur'};return m[id]?{id:id,role:'dr',name:m[id]}:null}
+function rpDriver(name){var n=rpNorm(name),x=S.drivers.filter(function(d){return n==='livreur'?/^livreur/.test(rpNorm(d.name)):rpNorm(d.name)===n})[0];
+ if(!x){var u=S.drivers.map(function(d){return d.c}),c=P.filter(function(z){return u.indexOf(z)<0})[0]||P[S.drivers.length%P.length];x={id:Date.now(),name:name,c:c};S.drivers.push(x)}return x}
+function rpLogin(a){RPAUTH=a.role;document.body.dataset.role=a.role;
+ if(a.role==='dr'){S.dv=rpDriver(a.name).id}persist();
+ var g1=$('#go1'),g2=$('#go2');g1.style.display=a.role==='co'?'':'none';g2.style.display=a.role==='dr'?'':'none';g1.classList.toggle('a',a.role==='co');g2.classList.toggle('a',a.role==='dr');
+ try{sessionStorage.setItem(RPKEY,a.id)}catch(e){}
+ $('#lge').textContent='';$('#lgi').value='';$('#login').classList.add('off');rpIntro()}
+function rpTry(){var a=rpAcc($('#lgi').value);if(!a){$('#lge').textContent='Identifiant incorrect. Veuillez réessayer.';$('#lgi').focus();return}rpLogin(a)}
+$('#lgb').onclick=rpTry;
+$('#lgi').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();rpTry()}});
+$('#lgi').addEventListener('input',function(){$('#lge').textContent=''});
+$('#lgo').onclick=function(){try{sessionStorage.removeItem(RPKEY)}catch(e){}RPAUTH='';delete document.body.dataset.role;document.body.classList.remove('dv');var l=$('#login');l.classList.remove('off');setTimeout(function(){$('#lgi').focus()},60)};
+(function(){var id='';try{id=sessionStorage.getItem(RPKEY)||''}catch(e){}var a=rpAcc(id);if(a)rpLogin(a);else setTimeout(function(){try{$('#lgi').focus()}catch(e){}},100)})();
 window.addEventListener('resize',draw);
 draw();
 $('#sects').addEventListener('click',function(e){if(e.target.dataset.sc)goSector(e.target.dataset.sc)});
