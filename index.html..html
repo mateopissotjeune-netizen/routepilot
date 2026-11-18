@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RoutePilot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#101D32;--blue:#3478F6;--sky:#60A5FA;--bg:#F4F7FC;--card:#fff;--ink:#101D32;--mut:#5B6B85;--line:#E2E8F2;--ok:#16A34A;--bad:#DC2626;--warn:#D97706}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.top{display:flex;align-items:center;gap:16px;padding:12px 20px;background:var(--navy);color:#fff;position:sticky;top:0;z-index:20}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;background:none;border:0;color:#fff}
+.bars{display:flex;flex-direction:column;gap:3px}.bars i{display:block;height:4px;border-radius:2px;background:var(--sky)}.bars i:nth-child(1){width:22px}.bars i:nth-child(2){width:16px;background:var(--blue)}.bars i:nth-child(3){width:10px}
+.sw{margin-left:auto;display:flex;gap:4px;background:#1B2B47;border-radius:10px;padding:3px}
+.sw button{background:none;border:0;color:#B8C6E0;padding:6px 12px;border-radius:8px;font-weight:500}
+.sw button.on{background:var(--blue);color:#fff}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 14px;font-weight:600}
+.btn.p{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.d{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn.s{padding:6px 10px;font-weight:500}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+main{max-width:1100px;margin:0 auto;padding:20px}
+.hero{background:var(--navy);color:#fff;border-radius:0 0 28px 28px;padding:72px 20px 80px;text-align:center}
+.hero h1{font-size:clamp(34px,7vw,60px);letter-spacing:-.03em;line-height:1.05}
+.hero p{color:#B8C6E0;max-width:520px;margin:16px auto 28px;font-size:18px}
+.hero .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.hero .btn:not(.p){background:transparent;color:#fff;border-color:#34476A}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.card h3{font-size:16px;margin:10px 0 4px}.card p{color:var(--mut);font-size:14px}
+.ico{width:38px;height:38px;border-radius:10px;background:#E8F0FE;color:var(--blue);display:grid;place-items:center}
+h2{font-size:22px;letter-spacing:-.01em}
+.sec{margin:40px 0 16px}
+.head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.badge{background:#DCFCE7;color:#166534;border-radius:99px;padding:2px 10px;font-size:12px;font-weight:600}
+.tabs{display:flex;gap:4px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:16px}
+.tabs button{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:none;border:1px solid transparent;border-radius:9px;padding:8px 6px;color:var(--mut);font-weight:500}
+.tabs button.on{border-color:var(--blue);color:var(--blue);background:#F0F6FF}
+@media(max-width:560px){.tabs button{font-size:12px;gap:5px;padding:7px 2px}.tabs svg.i{width:16px;height:16px}.sw button{padding:6px 8px;font-size:13px}.top{padding:10px 12px;gap:8px}}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.kpi b{display:block;font-size:26px;letter-spacing:-.02em}.kpi span{color:var(--mut);font-size:13px}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--blue)}
+.dates{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.dates .btn.on{border-color:var(--blue);color:var(--blue);background:#F0F6FF}
+input,select,textarea{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff;width:100%}
+label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;position:relative}
+.menu{position:absolute;top:100%;right:0;background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 8px 24px rgba(16,29,50,.12);z-index:5;min-width:200px}
+.menu button{display:block;width:100%;text-align:left;background:none;border:0;padding:8px 10px;border-radius:8px}
+.menu button:hover{background:var(--bg)}
+.mapw{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#EAF1FB;margin-bottom:14px}
+.mapw svg.map{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.mapw.reduced{height:200px}.mapw.normal{height:340px}
+.mapw.full{position:fixed;inset:0;z-index:50;border-radius:0;height:auto;margin:0}
+.mctl{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.mctl button{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:#fff;display:grid;place-items:center}
+.msz{position:absolute;left:10px;top:10px;display:flex;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.msz button{border:0;background:none;padding:6px 10px;font-size:13px}.msz button.on{background:var(--blue);color:#fff}
+.info{position:absolute;left:10px;bottom:10px;right:56px;max-width:320px;background:#fff;border-radius:12px;padding:12px;border:1px solid var(--line);font-size:13px}
+.stop{display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--line)}
+.stop:last-child{border:0}
+.num{width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.num.done{background:var(--ok)}.num.inc{background:var(--bad)}
+.stop .t{flex:1;min-width:0}.stop .t b{display:block}.stop .t span{color:var(--mut);font-size:13px}
+.chip{font-size:12px;border-radius:99px;padding:2px 9px;background:#E8F0FE;color:var(--blue);font-weight:600}
+.chip.done{background:#DCFCE7;color:#166534}.chip.inc{background:#FEE2E2;color:#991B1B}
+.empty{padding:28px;text-align:center;color:var(--mut)}
+dialog{border:0;border-radius:16px;padding:20px;width:min(440px,94vw);box-shadow:0 20px 60px rgba(16,29,50,.3)}
+dialog::backdrop{background:rgba(16,29,50,.5)}
+dialog h3{margin-bottom:6px}
+.dl{display:grid;grid-template-columns:1fr auto;gap:8px 12px;margin:12px 0;font-size:14px}.dl dd{font-weight:600;text-align:right;margin:0}.dl dt{color:var(--mut)}
+canvas{width:100%;height:150px;border:1px dashed #9AA9C2;border-radius:10px;background:#fff;touch-action:none}
+.drv{cursor:pointer}.drv.on{border-color:var(--blue)}
+.av{width:40px;height:40px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:600}
+.chauf{max-width:480px;margin:0 auto}
+.row2{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:10px;z-index:99}
+@media(prefers-reduced-motion:no-preference){.truck{animation:go 2.4s ease-in forwards}@keyframes go{0%{transform:translateX(-120%)}100%{transform:translateX(0)}}}
+</style>
+</head>
+<body>
+<header class="top">
+  <button class="logo" data-go="home" aria-label="Accueil RoutePilot"><span class="bars"><i></i><i></i><i></i></span>RoutePilot</button>
+  <nav class="sw" aria-label="Espaces">
+    <button data-go="home">Accueil</button><button data-go="co">Entreprise</button><button data-go="dr">Chauffeur</button>
+  </nav>
+</header>
+<div id="app"></div>
+<dialog id="dlg"></dialog>
+
+<script>
+const IC={
+truck:'<path d="M3 6h11v10H3zM14 9h4l3 3v4h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
+route:'<circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8a3 3 0 0 0 0-6H8a3 3 0 0 1 0-6h8"/>',
+chart:'<path d="M3 3v18h18M7 15l4-5 3 3 5-7"/>',
+users:'<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M17 11a3 3 0 0 0 0-6M21 20a5 5 0 0 0-4-5"/>',
+layout:'<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
+cog:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>',
+plus:'<path d="M12 5v14M5 12h14"/>',minus:'<path d="M5 12h14"/>',
+x:'<path d="M18 6 6 18M6 6l12 12"/>',
+check:'<path d="M20 6 9 17l-5-5"/>',
+phone:'<path d="M22 17v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3l2 5-2 1a12 12 0 0 0 6 6l1-2z"/>',
+more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+full:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+alert:'<path d="M12 3 2 20h20zM12 10v4M12 17v.01"/>',
+edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+pin:'<path d="M12 21s7-6 7-12a7 7 0 0 0-14 0c0 6 7 12 7 12z"/><circle cx="12" cy="9" r="2"/>'};
+const ic=n=>`<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg>`;
+const iso=d=>{const z=new Date(d);return new Date(z-z.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+const add=(n)=>{const d=new Date();d.setDate(d.getDate()+n);return iso(d)};
+const MOTIFS=['Client absent','Adresse introuvable','Refus de livraison','Colis endommagé','Problème technique'];
+const DEPOT={x:500,y:330};
+let S={view:'home',tab:'dash',date:add(0),drv:null,sel:null,size:'normal',menu:false,vb:{x:0,y:0,w:1000,h:600},cur:null,
+ stops:[],drivers:[],vehicles:[],incs:[],saved:0,
+ set:{assign:'manuelle',max:30,start:'08:00',end:'18:00',pause:30,cost:0.45,zones:''}};
+try{const j=localStorage.getItem('routepilot');if(j)Object.assign(S,JSON.parse(j),{view:'home',menu:false,sel:null,cur:null,vb:{x:0,y:0,w:1000,h:600}})}catch(e){}
+const save=()=>{try{localStorage.setItem('routepilot',JSON.stringify(S))}catch(e){}};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const $=s=>document.querySelector(s);
+const toast=t=>{const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.append(e);setTimeout(()=>e.remove(),2200)};
+
+/* --- données --- */
+const dayStops=()=>S.stops.filter(s=>s.date===S.date&&(!S.drv||s.drv===S.drv));
+const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y)*2/1000; // 1 unité = 2 m
+const km=l=>{let p=DEPOT,t=0;l.forEach(s=>{t+=dist(p,s);p=s});return l.length?t+dist(p,DEPOT):0};
+const hash=s=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return Math.abs(h)};
+const pos=a=>({x:120+hash(a)%760,y:90+hash(a+'y')%420});
+const hm=m=>{m=Math.round(m);return String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
+const tmin=t=>{const[a,b]=t.split(':').map(Number);return a*60+b};
+const initials=n=>n.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+const drvName=id=>(S.drivers.find(d=>d.id===id)||{}).name||'Non affecté';
+
+/* --- carte --- */
+function mapSVG(list){
+ const k=S.vb.w/1000;
+ const m=list.map((s,i)=>`<g data-pin="${s.id}" style="cursor:pointer"><circle cx="${s.x}" cy="${s.y}" r="${15*k}" fill="${s.status==='done'?'#16A34A':s.status==='inc'?'#DC2626':'#3478F6'}" stroke="#fff" stroke-width="${3*k}"/><text x="${s.x}" y="${s.y+5*k}" text-anchor="middle" font-size="${14*k}" font-weight="700" fill="#fff">${i+1}</text></g>`).join('');
+ return `<svg class="map" viewBox="${S.vb.x} ${S.vb.y} ${S.vb.w} ${S.vb.h}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Plan schématique de la Croix-Rousse, Lyon">
+ <rect x="-500" y="-500" width="2000" height="1600" fill="#EEF3FA"/>
+ <path d="M-500 -500H120C80 120 150 260 90 420S120 800 60 1100H-500Z" fill="#CFE2FB"/>
+ <path d="M1500 -500H920C960 150 880 300 940 460S900 800 960 1100H1500Z" fill="#CFE2FB"/>
+ <g stroke="#fff" stroke-width="14" fill="none" stroke-linecap="round"><path d="M170 560 330 330 560 120"/><path d="M200 140H880"/><path d="M230 330H850"/><path d="M420 90V560"/><path d="M640 100V540"/><path d="M180 460H840"/></g>
+ <g stroke="#fff" stroke-width="7" fill="none"><path d="M300 90V560M520 90V560M760 90V560M200 240H880M200 400H880"/></g>
+ <g font-size="15" fill="#5B6B85"><text x="150" y="560" transform="rotate(-48 150 560)">Grande Rue de la Croix-Rousse</text><text x="560" y="128">Boulevard de la Croix-Rousse</text><text x="30" y="300" fill="#3478F6">Saône</text><text x="950" y="300" fill="#3478F6">Rhône</text></g>
+ <rect x="${DEPOT.x-11}" y="${DEPOT.y-11}" width="${22*k}" height="${22*k}" rx="5" fill="#101D32" stroke="#fff" stroke-width="3"/>
+ ${m}</svg>`}
+function mapBox(list){
+ const o=S.sel&&list.find(s=>s.id===S.sel);
+ return `<div class="mapw ${S.size}" id="mapw">${mapSVG(list)}
+ <div class="msz">${[['reduced','Réduite'],['normal','Normale'],['full','Plein écran']].map(([k,l])=>`<button class="${S.size===k?'on':''}" data-size="${k}">${l}</button>`).join('')}</div>
+ <div class="mctl"><button data-z="0.7" aria-label="Zoom avant">${ic('plus')}</button><button data-z="1.4" aria-label="Zoom arrière">${ic('minus')}</button><button data-size="${S.size==='full'?'normal':'full'}" aria-label="Plein écran">${ic('full')}</button></div>
+ ${o?`<div class="info"><b>${list.indexOf(o)+1}. ${esc(o.name)}</b><br>${esc(o.addr)}<br>GPS ${(45.7745+(300-o.y)*1e-5).toFixed(5)}, ${(4.8320+(o.x-500)*1.3e-5).toFixed(5)}<br>Prévu à ${o.time} <span class="chip ${o.status}">${stat(o.status)}</span></div>`:''}</div>`}
+const stat=s=>s==='done'?'Livré':s==='inc'?'Incident':'À livrer';
+
+/* --- vues --- */
+function home(){return `<section class="hero"><div class="bars" style="align-items:center;margin:0 auto 20px;width:max-content"><i style="width:44px"></i><i style="width:32px;background:var(--blue)"></i><i style="width:20px"></i></div>
+<h1>RoutePilot</h1><p>Chaque kilomètre compte. Planifiez, suivez et prouvez chaque livraison.</p>
+<div class="row"><button class="btn p" data-go="co">Espace entreprise</button><button class="btn" data-go="dr">Espace chauffeur</button></div></section>
+<main><h2 class="sec">Tout ce qu’il faut pour livrer efficacement</h2><div class="grid4">
+${[['route','Optimisation','Ordonnez vos arrêts pour réduire les kilomètres parcourus.'],['truck','Livraisons','Signature obligatoire et incidents horodatés pour chaque client.'],['chart','Statistiques','Taux de réussite, distance et coût estimé de chaque tournée.'],['users','Équipes','Suivez la progression et le statut de chaque chauffeur.']].map(([i,t,p])=>`<div class="card"><div class="ico">${ic(i)}</div><h3>${t}</h3><p>${p}</p></div>`).join('')}</div></main>`}
+
+function dateBar(){const t=[[add(-1),'Hier'],[add(0),'Aujourd’hui'],[add(1),'Demain']];
+ return `<div class="dates">${t.map(([d,l])=>`<button class="btn s ${S.date===d?'on':''}" data-date="${d}">${l}</button>`).join('')}<input type="date" value="${S.date}" id="pickd" style="width:auto" aria-label="Choisir une date"></div>`}
+
+function dash(){const l=dayStops(),done=l.filter(s=>s.status==='done').length,inc=l.filter(s=>s.status==='inc').length,rest=l.length-done-inc;
+ const rate=l.length-rest?Math.round(done/(l.length-rest)*100)+' %':'—',k=km(l),cost=(k*S.set.cost).toFixed(2);
+ const late=l.filter(s=>s.status==='pending'&&s.date===add(0)&&tmin(s.time)<new Date().getHours()*60+new Date().getMinutes()).length;
+ const kp=[['Effectuées',done],['Restantes',rest],['Taux de réussite',rate],['Kilomètres',k.toFixed(1)+' km'],['Retards en cours',late],['Coût estimé',cost+' €'],['Km économisés',S.saved.toFixed(1)+' km']];
+ const ev=S.incs.filter(i=>i.date===S.date);
+ return dateBar()+`<div class="kpis">${kp.map(([a,b])=>`<div class="card kpi"><b>${b}</b><span>${a}</span></div>`).join('')}</div>
+ <div class="card"><h3>Progression de la journée</h3><div class="bar" style="margin:10px 0"><i style="width:${l.length?Math.round(done/l.length*100):0}%"></i></div><p>${done} livraison(s) sur ${l.length}</p></div>
+ <div class="card" style="margin-top:14px"><h3>Incidents</h3>${ev.length?ev.map(i=>`<div class="stop"><div class="num inc">!</div><div class="t"><b>${esc(i.motif)}</b><span>${esc(i.client)} · ${i.at} · ${esc(drvName(i.drv))}</span></div></div>`).join(''):'<p>Aucun incident pour cette date.</p>'}</div>`}
+
+function tour(){const l=dayStops();
+ return dateBar()+`<div class="actions"><button class="btn p" data-act="opt">${ic('route')}Optimiser la tournée</button><button class="btn" data-act="new">${ic('plus')}Ajouter un arrêt</button><button class="btn" data-act="det">Détails de la tournée</button><button class="btn" data-act="menu" aria-expanded="${S.menu}">${ic('more')}Autres actions</button>
+ ${S.menu?`<div class="menu"><button data-act="dup">Dupliquer vers demain</button><button data-act="exp">Exporter les preuves (CSV)</button><button data-act="reset">Réinitialiser les statuts</button><button data-act="clear" style="color:var(--bad)">Effacer la tournée</button></div>`:''}</div>
+ ${mapBox(l)}
+ <div class="card" style="padding:0">${l.length?l.map((s,i)=>`<div class="stop"><div class="num ${s.status}">${i+1}</div><div class="t"><b>${esc(s.name)}</b><span>${esc(s.addr)} · ${s.time} · ${esc(drvName(s.drv))}</span></div><span class="chip ${s.status}">${stat(s.status)}</span><button class="btn s" data-edit="${s.id}" aria-label="Modifier">${ic('edit')}</button><button class="btn s" data-del="${s.id}" aria-label="Supprimer">${ic('trash')}</button></div>`).join(''):'<div class="empty">Aucun arrêt pour cette date. Ajoutez un premier arrêt pour construire la tournée.</div>'}</div>
+ <div class="row2"><button class="btn" data-act="all" ${l.some(s=>s.status==='pending')?'':'disabled'}>${ic('check')}Valider toutes les livraisons</button></div>`}
+
+function drivers(){return `<div class="actions"><button class="btn p" data-act="newd">${ic('plus')}Ajouter un chauffeur</button>${S.drv?'<button class="btn" data-act="alld">Voir toutes les tournées</button>':''}</div>
+ <div class="grid4">${S.drivers.length?S.drivers.map(d=>{const l=S.stops.filter(s=>s.date===S.date&&s.drv===d.id),dn=l.filter(s=>s.status==='done').length,p=l.length?Math.round(dn/l.length*100):0,st=!l.length?'Disponible':dn===l.length?'Terminé':'En tournée';
+ return `<div class="card drv ${S.drv===d.id?'on':''}" data-drv="${d.id}"><div style="display:flex;gap:12px;align-items:center"><div class="av">${esc(initials(d.name))}</div><div><b>${esc(d.name)}</b><br><span class="chip ${st==='Terminé'?'done':''}">${st}</span></div></div><p style="margin-top:10px">${dn} / ${l.length} livraisons</p><div class="bar"><i style="width:${p}%"></i></div></div>`}).join(''):'<div class="card empty" style="grid-column:1/-1">Aucun chauffeur enregistré.</div>'}</div>`}
+
+function params(){const s=S.set;return `<div class="card"><h3>Véhicules</h3>
+ ${S.vehicles.map(v=>`<div class="stop"><div class="t"><b>${esc(v.brand)} ${esc(v.model)}</b><span>${esc(v.plate)}</span></div><button class="btn s" data-delv="${v.id}" aria-label="Supprimer">${ic('trash')}</button></div>`).join('')||'<p style="margin:8px 0">Aucun véhicule enregistré.</p>'}
+ <div class="two"><div><label>Marque</label><input id="vb"></div><div><label>Modèle</label><input id="vm"></div></div><label>Plaque d’immatriculation</label><input id="vp"><div class="row2"><button class="btn p" data-act="addv">Enregistrer le véhicule</button></div></div>
+ <div class="card" style="margin-top:14px"><h3>Livreurs</h3>
+ <div class="two"><div><label>Affectation des tournées</label><select data-set="assign"><option ${s.assign==='manuelle'?'selected':''}>manuelle</option><option ${s.assign==='automatique'?'selected':''}>automatique</option></select></div><div><label>Livraisons maximum par livreur</label><input type="number" min="1" data-set="max" value="${s.max}"></div>
+ <div><label>Début de journée</label><input type="time" data-set="start" value="${s.start}"></div><div><label>Fin de journée</label><input type="time" data-set="end" value="${s.end}"></div>
+ <div><label>Pause (minutes)</label><input type="number" min="0" data-set="pause" value="${s.pause}"></div><div><label>Coût au kilomètre (€)</label><input type="number" step="0.01" min="0" data-set="cost" value="${s.cost}"></div></div>
+ <label>Zones géographiques attribuées</label><textarea data-set="zones" rows="2" placeholder="Ex. Croix-Rousse, Lyon 4e">${esc(s.zones)}</textarea>
+ <p style="margin-top:8px">Les absences se gèrent dans la fiche de chaque chauffeur.</p></div>`}
+
+function co(){const T=[['dash','layout','Tableau de bord'],['tour','route','Tournées'],['drv','users','Chauffeurs'],['set','cog','Paramètres']];
+ return `<main><div class="head"><h2>RoutePilot</h2><span class="badge">Entreprise</span></div>
+ <nav class="tabs" aria-label="Rubriques">${T.map(([k,i,l])=>`<button class="${S.tab===k?'on':''}" data-tab="${k}">${ic(i)}${l}</button>`).join('')}</nav>
+ ${S.tab==='dash'?dash():S.tab==='tour'?tour():S.tab==='drv'?drivers():params()}</main>`}
+
+function dr(){const me=S.drv||(S.drivers[0]||{}).id;const l=S.stops.filter(s=>s.date===add(0)&&s.drv===me);const dn=l.filter(s=>s.status==='done').length;const nx=l.filter(s=>s.status==='pending');
+ if(S.cur){const s=S.stops.find(x=>x.id===S.cur);return `<main class="chauf"><div class="card"><div class="num" style="margin-bottom:8px">${l.indexOf(s)+1}</div><h2>${esc(s.name)}</h2><p>${esc(s.addr)} · ${s.time}</p>
+ ${s.phone?`<p style="margin-top:8px"><a class="btn" href="tel:${esc(s.phone)}">${ic('phone')}Appeler ${esc(s.phone)}</a></p>`:''}
+ <p style="margin-top:10px"><b>Consignes</b><br>${esc(s.notes)||'Aucune consigne.'}</p>
+ <label>Signature du client (obligatoire)</label><canvas id="sig"></canvas>
+ <div class="row2"><button class="btn p" data-act="ok">${ic('check')}Valider la livraison</button><button class="btn" data-act="clr">Effacer la signature</button><button class="btn" data-act="inc">${ic('alert')}Signaler un incident</button><button class="btn" data-act="back">Retour</button></div></div></main>`}
+ return `<main class="chauf"><div class="head"><h2>Ma tournée</h2><span class="badge">Chauffeur</span></div>
+ ${S.drivers.length?`<select data-me style="margin-bottom:14px">${S.drivers.map(d=>`<option value="${d.id}" ${d.id===me?'selected':''}>${esc(d.name)}</option>`).join('')}</select>`:''}
+ <div class="kpis"><div class="card kpi"><b>${dn}/${l.length}</b><span>Livraisons</span></div><div class="card kpi"><b>${km(l).toFixed(1)} km</b><span>Distance</span></div></div>
+ <div class="bar" style="margin-bottom:14px"><i style="width:${l.length?Math.round(dn/l.length*100):0}%"></i></div>
+ <button class="btn p" data-act="start" style="width:100%;justify-content:center" ${nx.length?'':'disabled'}>${ic('truck')}Démarrer la tournée</button>
+ <h3 style="margin:18px 0 8px">Prochains arrêts</h3><div class="card" style="padding:0">${nx.length?nx.map(s=>`<div class="stop"><div class="num">${l.indexOf(s)+1}</div><div class="t"><b>${esc(s.name)}</b><span>${esc(s.addr)} · ${s.time}</span></div></div>`).join(''):`<div class="empty">${l.length?'Tournée terminée.':'Aucune tournée aujourd’hui. L’entreprise vous en attribuera une.'}</div>`}</div></main>`}
+
+function render(){
+ $('#app').innerHTML=S.view==='home'?home():S.view==='co'?co():dr();
+ document.querySelectorAll('.sw button').forEach(b=>b.classList.toggle('on',b.dataset.go===S.view));
+ const c=$('#sig');if(c)sigInit(c);save();
+}
+
+/* --- formulaires --- */
+function stopForm(s){const e=s||{};
+ $('#dlg').innerHTML=`<h3>${s?'Modifier l’arrêt':'Ajouter un arrêt'}</h3><form method="dialog" id="f">
+ <label>Nom du client</label><input name="name" required value="${esc(e.name)}"><label>Adresse complète</label><input name="addr" required value="${esc(e.addr)}">
+ <div class="two"><div><label>Heure estimée</label><input type="time" name="time" required value="${e.time||'09:00'}"></div><div><label>Téléphone</label><input name="phone" value="${esc(e.phone)}"></div></div>
+ <label>Chauffeur</label><select name="drv"><option value="">Non affecté</option>${S.drivers.map(d=>`<option value="${d.id}" ${e.drv===d.id?'selected':''}>${esc(d.name)}</option>`).join('')}</select>
+ <label>Consignes</label><textarea name="notes" rows="2">${esc(e.notes)}</textarea>
+ <div class="row2"><button class="btn p" value="ok">Enregistrer</button><button class="btn" value="x" formnovalidate>Annuler</button></div></form>`;
+ $('#dlg').showModal();
+ $('#f').onsubmit=ev=>{if(ev.submitter.value!=='ok')return;const f=Object.fromEntries(new FormData(ev.target));
+  if(s){Object.assign(s,f,s.addr!==f.addr?pos(f.addr):{})}else S.stops.push({id:'s'+Date.now(),date:S.date,status:'pending',...f,...pos(f.addr)});render()}}
+function ask(title,text,fn,label='Confirmer'){$('#dlg').innerHTML=`<h3>${title}</h3><p>${text}</p><div class="row2"><button class="btn d" id="yes">${label}</button><button class="btn" id="no">Annuler</button></div>`;$('#dlg').showModal();$('#no').onclick=()=>$('#dlg').close();$('#yes').onclick=()=>{$('#dlg').close();fn()}}
+
+function details(){const l=dayStops(),k=km(l),drive=k/30*60,spent=l.length*5,pause=l.length?+S.set.pause:0,st=tmin(S.set.start),done=l.filter(s=>s.status==='done').length;
+ $('#dlg').innerHTML=`<h3>Détails de la tournée</h3><dl class="dl"><dt>Heure de départ</dt><dd>${S.set.start}</dd><dt>Retour estimé</dt><dd>${l.length?hm(st+drive+spent+pause):'—'}</dd><dt>Distance totale</dt><dd>${k.toFixed(1)} km</dd><dt>Nombre de clients</dt><dd>${l.length}</dd><dt>Temps passé chez les clients</dt><dd>${spent} min</dd><dt>Temps de pause</dt><dd>${pause} min</dd><dt>Coût estimé</dt><dd>${(k*S.set.cost).toFixed(2)} €</dd><dt>Prévu</dt><dd>${l.length} livraisons</dd><dt>Réel</dt><dd>${done} livrées</dd></dl><div class="row2"><button class="btn p" onclick="$('#dlg').close()">Fermer</button></div>`;$('#dlg').showModal()}
+
+/* --- signature --- */
+let inked=false;
+function sigInit(c){inked=false;const r=c.getBoundingClientRect();c.width=r.width*2;c.height=300;const x=c.getContext('2d');x.scale(2,2);x.lineWidth=2;x.lineCap='round';let d=false;
+ const p=e=>{const b=c.getBoundingClientRect();return[e.clientX-b.left,e.clientY-b.top]};
+ c.onpointerdown=e=>{d=true;c.setPointerCapture(e.pointerId);x.beginPath();x.moveTo(...p(e))};
+ c.onpointermove=e=>{if(d){x.lineTo(...p(e));x.stroke();inked=true}};c.onpointerup=()=>d=false}
+
+/* --- actions --- */
+const A={
+ opt(){const l=dayStops();if(l.length<2)return toast('Ajoutez au moins deux arrêts');const before=km(l);let p=DEPOT,rest=[...l],o=[];
+  while(rest.length){rest.sort((a,b)=>dist(p,a)-dist(p,b));p=rest.shift();o.push(p)}
+  const idx=S.stops.map((s,i)=>l.includes(s)?i:-1).filter(i=>i>=0);const others=S.stops.filter(s=>!l.includes(s));
+  const slots=idx.length;const all=[...others,...o];S.stops=all;const gain=Math.max(0,before-km(o));S.saved+=gain;
+  o.forEach((s,i)=>s.time=hm(tmin(S.set.start)+30+i*20));render();toast(gain>0?`${gain.toFixed(1)} km économisés`:'Tournée déjà optimale')},
+ new(){stopForm()},menu(){S.menu=!S.menu;render()},det:details,
+ dup(){S.menu=false;const l=dayStops();l.forEach(s=>S.stops.push({...s,id:'s'+Math.random().toString(36).slice(2),date:add(1),status:'pending'}));render();toast('Tournée dupliquée vers demain')},
+ exp(){S.menu=false;const rows=S.stops.filter(s=>s.status==='done'&&s.date===S.date);if(!rows.length)return toast('Aucune preuve à exporter');
+  const csv='Client;Adresse;Heure;Chauffeur;Validée le\n'+rows.map(s=>[s.name,s.addr,s.time,drvName(s.drv),s.doneAt].join(';')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='preuves-'+S.date+'.csv';a.click()},
+ reset(){S.menu=false;ask('Réinitialiser les statuts','Tous les arrêts de cette date repasseront à « À livrer ».',()=>{dayStops().forEach(s=>s.status='pending');render()})},
+ clear(){S.menu=false;ask('Effacer la tournée','Les arrêts de cette date seront supprimés définitivement.',()=>{const l=dayStops();S.stops=S.stops.filter(s=>!l.includes(s));render()},'Effacer')},
+ all(){ask('Valider toutes les livraisons','Tous les arrêts restants seront marqués comme livrés (panne de réseau, par exemple).',()=>{dayStops().filter(s=>s.status==='pending').forEach(s=>{s.status='done';s.doneAt=new Date().toLocaleString('fr-FR')});render()})},
+ newd(){$('#dlg').innerHTML=`<h3>Ajouter un chauffeur</h3><form method="dialog" id="f"><label>Nom complet</label><input name="n" required><div class="row2"><button class="btn p" value="ok">Enregistrer</button><button class="btn" value="x" formnovalidate>Annuler</button></div></form>`;$('#dlg').showModal();
+  $('#f').onsubmit=e=>{if(e.submitter.value==='ok'){S.drivers.push({id:'d'+Date.now(),name:new FormData(e.target).get('n')});render()}}},
+ alld(){S.drv=null;render()},
+ addv(){const b=$('#vb').value.trim(),m=$('#vm').value.trim(),p=$('#vp').value.trim();if(!b||!m||!p)return toast('Renseignez marque, modèle et plaque');S.vehicles.push({id:'v'+Date.now(),brand:b,model:m,plate:p});render()},
+ start(){const me=S.drv||(S.drivers[0]||{}).id,n=S.stops.find(s=>s.date===add(0)&&s.drv===me&&s.status==='pending');if(n){S.cur=n.id;render()}},
+ back(){S.cur=null;render()},clr(){const c=$('#sig');c.getContext('2d').clearRect(0,0,c.width,c.height);inked=false},
+ ok(){if(!inked)return toast('La signature du client est obligatoire');const s=S.stops.find(x=>x.id===S.cur);s.status='done';s.doneAt=new Date().toLocaleString('fr-FR');
+  const nx=S.stops.find(x=>x.date===s.date&&x.drv===s.drv&&x.status==='pending');S.cur=nx?nx.id:null;render();toast(nx?'Livraison validée, client suivant':'Tournée terminée')},
+ inc(){$('#dlg').innerHTML=`<h3>Motif de l’incident</h3><div style="display:grid;gap:8px;margin-top:10px">${MOTIFS.map(m=>`<button class="btn" data-m="${m}">${m}</button>`).join('')}</div>`;$('#dlg').showModal();
+  document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{const m=b.dataset.m;ask('Êtes-vous sûr ?',`Enregistrer l’incident « ${m} » pour ce client ?`,()=>{const s=S.stops.find(x=>x.id===S.cur);s.status='inc';
+   S.incs.push({date:s.date,motif:m,client:s.name,drv:s.drv,at:new Date().toLocaleString('fr-FR')});const nx=S.stops.find(x=>x.date===s.date&&x.drv===s.drv&&x.status==='pending');S.cur=nx?nx.id:null;render()},'Oui, enregistrer')})}
+};
+
+/* --- événements --- */
+document.addEventListener('click',e=>{const t=e.target.closest('button,[data-drv],[data-pin],[data-go]');if(!t){if(S.menu){S.menu=false;render()}return}
+ const d=t.dataset;
+ if(d.go){S.view=d.go;S.cur=null;render();scrollTo(0,0)}
+ else if(d.tab){S.tab=d.tab;S.menu=false;render()}
+ else if(d.date){S.date=d.date;render()}
+ else if(d.act&&A[d.act])A[d.act]();
+ else if(d.size){S.size=d.size;render()}
+ else if(d.z){const f=+d.z,v=S.vb,cx=v.x+v.w/2,cy=v.y+v.h/2;v.w=Math.min(1000,Math.max(200,v.w*f));v.h=v.w*.6;v.x=cx-v.w/2;v.y=cy-v.h/2;render()}
+ else if(d.pin){S.sel=d.pin;render()}
+ else if(d.edit)stopForm(S.stops.find(s=>s.id===d.edit));
+ else if(d.del){const s=S.stops.find(x=>x.id===d.del);ask('Supprimer l’arrêt',esc(s.name)+' sera retiré de la tournée.',()=>{S.stops=S.stops.filter(x=>x!==s);render()},'Supprimer')}
+ else if(d.delv){S.vehicles=S.vehicles.filter(v=>v.id!==d.delv);render()}
+ else if(d.drv){S.drv=S.drv===d.drv?null:d.drv;render()}
+});
+document.addEventListener('change',e=>{const t=e.target;
+ if(t.id==='pickd'&&t.value){S.date=t.value;render()}
+ else if(t.dataset.set){S.set[t.dataset.set]=t.type==='number'?+t.value:t.value;save()}
+ else if('me' in t.dataset){S.drv=t.value;render()}});
+document.addEventListener('pointerdown',e=>{const m=e.target.closest('svg.map');if(!m||e.target.closest('[data-pin]'))return;
+ let lx=e.clientX,ly=e.clientY;const mv=ev=>{const r=m.getBoundingClientRect(),k=S.vb.w/r.width;S.vb.x-=(ev.clientX-lx)*k;S.vb.y-=(ev.clientY-ly)*k;lx=ev.clientX;ly=ev.clientY;m.setAttribute('viewBox',`${S.vb.x} ${S.vb.y} ${S.vb.w} ${S.vb.h}`)};
+ const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up)};addEventListener('pointermove',mv);addEventListener('pointerup',up)});
+render();
+</script>
+</body>
+</html>
