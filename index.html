@@ -367,17 +367,19 @@ body.dv.dlv .dbn{display:none}body.dv.dlv .dct{padding-bottom:20px}
 #login input:focus{outline:2px solid var(--pri);border-color:var(--pri)}
 #login .er{color:#FCA5A5;font-size:14px;min-height:20px;margin:8px 0 14px}
 #login .go{width:100%;padding:15px;border-radius:14px;border:0;background:#2A68DD;color:#fff;font-size:16px;font-weight:600;box-shadow:0 6px 20px rgba(52,120,246,.4);cursor:pointer}#login .go:hover{background:#2459C2}
+#login .bk{display:block;margin:14px auto 0;background:transparent;border:0;color:#9FB2D3;font-size:14px;cursor:pointer}
 #home .lo{display:block;margin:14px auto 0;background:transparent;border:0;color:#8FA3C4;font-size:14px;text-decoration:underline;cursor:pointer}
 </style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="lg" viewBox="-6 -6 324 320"><g fill="#fff" stroke="#fff" stroke-width="8" stroke-linejoin="round"><polygon id="st" points="0,50 100,50 150,0 312,0 312,50 205,50 155,100 0,100"/><use href="#st" y="104"/><use href="#st" y="208"/></g></symbol></svg>
-<div id="login" role="dialog" aria-label="Connexion"><div class="lin">
+<div id="login" class="off" role="dialog" aria-label="Connexion"><div class="lin">
 <div class="brand"><span class="tile"><svg><use href="#lg"/></svg></span><div><b>Route<i>Pilot</i></b><small>Chaque kilomètre compte</small></div></div>
 <h2>Connexion</h2><p class="d">Saisissez votre identifiant pour accéder à votre espace.</p>
 <label for="lgi">Identifiant</label><input id="lgi" type="text" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" maxlength="12">
 <p class="er" id="lge" role="alert"></p>
 <button class="go" id="lgb" type="button">Se connecter</button>
+<button class="bk" id="lgx" type="button">← Retour à l’accueil</button>
 </div></div>
 <div id="home" class="pre"><div class="in">
 <div class="brand"><span class="tile"><svg><use href="#lg"/></svg></span><div><b>Route<i>Pilot</i></b><small>Gestion et optimisation des livraisons</small></div></div>
@@ -1132,8 +1134,8 @@ $('#pop').addEventListener('click',function(e){var k=e.target.dataset,b=e.target
  if(k.cl){S.sel=null;draw()}else if(k.o)proof(k.o);else if(k.e)editStop(k.e);
  else if(k.dx){if(!b.dataset.arm){b.dataset.arm=1;b.style.color='var(--ko)';b.innerHTML=I('trash')+'Confirmer';return}delStop(k.dx)}});
 $('#gd').onclick=function(){$('#ft').scrollIntoView({behavior:'smooth'})};
-$('#go1').onclick=function(){document.body.classList.remove('dv');setCP('dash');$('#home').classList.add('off')};
-$('#go2').onclick=function(){document.body.classList.add('dv');document.body.classList.remove('cd');DP='home';drvRender();if(me().sharing)geoStart();$('#home').classList.add('off')};
+$('#go1').onclick=function(){rpGo('co')};
+$('#go2').onclick=function(){rpGo('dr')};
 var RPINTRO=0;function rpIntro(){if(RPINTRO)return;RPINTRO=1;var it=$('#intro'),h=$('#home'),br=h.querySelector('.in .brand'),tt=it.querySelector('.ttl'),sv=$('#isc'),done=false,c,raf;
 function fin(){if(done)return;done=true;cancelAnimationFrame(raf);h.classList.remove('pre');it.classList.add('end');setTimeout(function(){it.style.display='none'},700)}
 if(matchMedia('(prefers-reduced-motion:reduce)').matches){fin();return}
@@ -1191,22 +1193,29 @@ raf=requestAnimationFrame(frame);
 setTimeout(function(){if(done)return;tt.style.height=tt.offsetHeight+'px';var r=c.getBoundingClientRect();
  c.style.cssText='position:fixed;left:'+r.left+'px;top:'+r.top+'px;margin:0;transform-origin:0 0;transform:scale(1.35)';it.appendChild(c);it.classList.add('go');
  setTimeout(function(){if(done)return;var q=br.getBoundingClientRect();c.style.transition='transform .9s cubic-bezier(.6,0,.2,1)';c.style.transform='translate('+(q.left-r.left)+'px,'+(q.top-r.top)+'px) scale(1)';setTimeout(fin,1000)},60)},4600)}
-var RPAUTH='',RPKEY='rp_auth';
+var RPAUTH='',RPKEY='rp_auth',RPTGT='';
 function rpNorm(t){return String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()}
 function rpAcc(id){id=String(id||'').trim().toUpperCase();if(id==='ETP')return{id:id,role:'co'};var m={M:'Matéo',R:'Romain',E:'Elliot',L:'Livreur'};return m[id]?{id:id,role:'dr',name:m[id]}:null}
 function rpDriver(name){var n=rpNorm(name),x=S.drivers.filter(function(d){return n==='livreur'?/^livreur/.test(rpNorm(d.name)):rpNorm(d.name)===n})[0];
  if(!x){var u=S.drivers.map(function(d){return d.c}),c=P.filter(function(z){return u.indexOf(z)<0})[0]||P[S.drivers.length%P.length];x={id:Date.now(),name:name,c:c};S.drivers.push(x)}return x}
-function rpLogin(a){RPAUTH=a.role;document.body.dataset.role=a.role;
+function rpBtn(){$('#lgo').style.display=RPAUTH?'':'none'}
+function rpSet(a){RPAUTH=a.role;document.body.dataset.role=a.role;
  if(a.role==='dr'){S.dv=rpDriver(a.name).id}persist();
- var g1=$('#go1'),g2=$('#go2');g1.style.display=a.role==='co'?'':'none';g2.style.display=a.role==='dr'?'':'none';g1.classList.toggle('a',a.role==='co');g2.classList.toggle('a',a.role==='dr');
- try{sessionStorage.setItem(RPKEY,a.id)}catch(e){}
- $('#lge').textContent='';$('#lgi').value='';$('#login').classList.add('off');rpIntro()}
-function rpTry(){var a=rpAcc($('#lgi').value);if(!a){$('#lge').textContent='Identifiant incorrect. Veuillez réessayer.';$('#lgi').focus();return}rpLogin(a)}
+ try{sessionStorage.setItem(RPKEY,a.id)}catch(e){}rpBtn()}
+function rpOpenCo(){document.body.classList.remove('dv');setCP('dash');$('#home').classList.add('off')}
+function rpOpenDr(){document.body.classList.add('dv');document.body.classList.remove('cd');DP='home';drvRender();if(me().sharing)geoStart();$('#home').classList.add('off')}
+function rpAsk(t){RPTGT=t;$('#lge').textContent='';$('#lgi').value='';$('#login').classList.remove('off');setTimeout(function(){$('#lgi').focus()},60)}
+function rpGo(t){if(RPAUTH===t){if(t==='co')rpOpenCo();else rpOpenDr()}else rpAsk(t)}
+function rpTry(){var a=rpAcc($('#lgi').value);
+ if(!a){$('#lge').textContent='Identifiant incorrect. Veuillez réessayer.';$('#lgi').focus();return}
+ if(RPTGT&&a.role!==RPTGT){$('#lge').textContent='Cet identifiant ne donne pas accès à l’espace '+(RPTGT==='co'?'entreprise':'chauffeur')+'.';$('#lgi').focus();return}
+ rpSet(a);$('#lge').textContent='';$('#lgi').value='';$('#login').classList.add('off');rpGo(RPTGT||a.role)}
 $('#lgb').onclick=rpTry;
+$('#lgx').onclick=function(){$('#login').classList.add('off')};
 $('#lgi').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();rpTry()}});
 $('#lgi').addEventListener('input',function(){$('#lge').textContent=''});
-$('#lgo').onclick=function(){try{sessionStorage.removeItem(RPKEY)}catch(e){}RPAUTH='';delete document.body.dataset.role;document.body.classList.remove('dv');var l=$('#login');l.classList.remove('off');setTimeout(function(){$('#lgi').focus()},60)};
-(function(){var id='';try{id=sessionStorage.getItem(RPKEY)||''}catch(e){}var a=rpAcc(id);if(a)rpLogin(a);else setTimeout(function(){try{$('#lgi').focus()}catch(e){}},100)})();
+$('#lgo').onclick=function(){try{sessionStorage.removeItem(RPKEY)}catch(e){}RPAUTH='';delete document.body.dataset.role;rpBtn()};
+(function(){var id='';try{id=sessionStorage.getItem(RPKEY)||''}catch(e){}var a=rpAcc(id);if(a)rpSet(a);else rpBtn();rpIntro()})();
 window.addEventListener('resize',draw);
 draw();
 $('#sects').addEventListener('click',function(e){if(e.target.dataset.sc)goSector(e.target.dataset.sc)});
