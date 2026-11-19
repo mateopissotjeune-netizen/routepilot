@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RoutePilot</title>
+<script>/* URL de l’API RoutePilot (FastAPI), ex. 'https://api.mondomaine.fr'. Vide = mode local (prototype). Aussi possible : ouvrir la page une fois avec ?api=https://... */window.RP_API_URL='';</script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mapbox-gl@2.15.0/dist/mapbox-gl.css">
 <script src="https://cdn.jsdelivr.net/npm/mapbox-gl@2.15.0/dist/mapbox-gl.js"></script>
 <script>
@@ -364,11 +365,20 @@ body.dv.dlv .dbn{display:none}body.dv.dlv .dct{padding-bottom:20px}
 #login p.d{color:#B6C4DE;font-size:16px;margin:8px 0 22px}
 #login label{display:block;font-size:13px;color:#9FB2D3;margin:0 0 6px}
 #login input{width:100%;box-sizing:border-box;padding:14px;font-size:16px;border-radius:12px;border:1px solid #2A3D5F;background:#1B2B47;color:#fff;letter-spacing:.08em;text-transform:uppercase}
+#login #lgi,#login #lgp{text-transform:none;letter-spacing:.02em}
 #login input:focus{outline:2px solid var(--pri);border-color:var(--pri)}
 #login .er{color:#FCA5A5;font-size:14px;min-height:20px;margin:8px 0 14px}
 #login .go{width:100%;padding:15px;border-radius:14px;border:0;background:#2A68DD;color:#fff;font-size:16px;font-weight:600;box-shadow:0 6px 20px rgba(52,120,246,.4);cursor:pointer}#login .go:hover{background:#2459C2}
 #login .bk{display:block;margin:14px auto 0;background:transparent;border:0;color:#9FB2D3;font-size:14px;cursor:pointer}
 #home .lo{display:block;margin:14px auto 0;background:transparent;border:0;color:#8FA3C4;font-size:14px;text-decoration:underline;cursor:pointer}
+
+/* Trois zones : livreurs, livraisons, carte (lecture) */
+@media(min-width:960px){#plan .wrap.z3{grid-template-columns:minmax(380px,.9fr) 1.4fr;grid-template-areas:"z1 m" "z2 m";align-items:start}#plan .z1{grid-area:z1}#plan .z2{grid-area:z2}#plan .z3m{grid-area:m;position:sticky;top:12px}#plan .z3m .mw{height:calc(100vh - 150px);min-height:480px}#plan .z1 .tabs{flex-direction:column;overflow:visible;margin-bottom:0}#plan .z1 .dcd{min-width:0}}
+.zs{color:var(--mut);font-size:12px;font-weight:500}
+#plan .z1 .hd,#plan .z2 .hd{margin-bottom:8px}
+#plan .tl{display:none}
+.addp{margin:10px 0;padding:10px;border:1px solid var(--bd);border-radius:12px;background:#fff}.addp[hidden]{display:none}.adr{display:flex;gap:8px}.adr input{flex:1;min-width:0;min-height:40px;padding:0 12px;border:1px solid var(--bd);border-radius:10px;font:inherit}.adres{display:grid;gap:4px;margin-top:6px}.adres .gr2{text-align:left;padding:9px 10px;border:1px solid var(--bd);border-radius:8px;background:#F4F7FC;font:inherit}.adres .s{margin:4px 2px;color:var(--mut);font-size:13px}
+#dash .ba{flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -376,7 +386,8 @@ body.dv.dlv .dbn{display:none}body.dv.dlv .dct{padding-bottom:20px}
 <div id="login" class="off" role="dialog" aria-label="Connexion"><div class="lin">
 <div class="brand"><span class="tile"><svg><use href="#lg"/></svg></span><div><b>Route<i>Pilot</i></b><small>Chaque kilomètre compte</small></div></div>
 <h2>Connexion</h2><p class="d">Saisissez votre identifiant pour accéder à votre espace.</p>
-<label for="lgi">Identifiant</label><input id="lgi" type="text" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" maxlength="12">
+<label for="lgi">Identifiant</label><input id="lgi" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="120">
+<label for="lgp" id="lgpl" style="display:none;margin-top:14px">Mot de passe</label><input id="lgp" type="password" autocomplete="current-password" style="display:none" maxlength="72">
 <p class="er" id="lge" role="alert"></p>
 <button class="go" id="lgb" type="button">Se connecter</button>
 <button class="bk" id="lgx" type="button">← Retour à l’accueil</button>
@@ -395,25 +406,25 @@ body.dv.dlv .dbn{display:none}body.dv.dlv .dct{padding-bottom:20px}
 <header class="top"><div class="brand"><span class="tile"><svg><use href="#lg"/></svg></span><b>Route<i>Pilot</i></b></div><nav class="ctabs" aria-label="Espace entreprise"><button data-c="dash" class="on"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/></svg><span>Tableau de bord</span></button><button data-c="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8 16l8-8"/></svg><span>Tournées</span></button><button data-c="drivers"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="9" r="2.8"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 14.5c3 0 5.5 1.8 5.5 5"/></svg><span>Chauffeurs</span></button><button data-c="set"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.5l1.6 2.3 2.8-.4.9 2.7 2.6 1.2-.6 2.8 1.6 2.4-2 2 .1 2.9-2.8.7-1.5 2.4-2.7-1-2.7 1-1.5-2.4-2.8-.7.1-2.9-2-2 1.6-2.4-.6-2.8 2.6-1.2.9-2.7 2.8.4z"/></svg><span>Paramètres</span></button></nav><button class="ic" id="dh2" data-ic="house" aria-label="Accueil"></button></header>
 <div class="dbarx co"></div>
 <main id="plan">
-<div class="tabs" id="tabs"></div>
 <div class="kp">
 <div class="k" id="k1"><span class="ki" data-ic="route"></span><div><small>Distance estimée</small><b id="kB">—</b><em id="kBs"></em></div></div>
 <div class="k"><span class="ki" data-ic="down"></span><div><small>Km économisés</small><b id="kS">—</b><em id="kSs"></em></div></div>
 <div class="k"><span class="ki" data-ic="clock"></span><div><small>Fin de tournée</small><b id="tT">—</b><em id="tTs"></em></div></div>
 <div class="k"><span class="ki" data-ic="zap"></span><div><small>Économies du jour</small><b id="kG">—</b><em id="kGs"></em></div></div>
 </div>
-<div class="wrap">
-<section>
-<div class="mw" id="mw"><div id="mbc"></div>
+<div class="wrap z3">
+<section class="z1"><div class="hd"><b>Livreurs</b><span class="zs">Choisissez la tournée à préparer</span></div><div class="tabs" id="tabs"></div></section>
+<section class="z2"><div class="hd"><b>Livraisons</b><span id="pc" style="color:var(--mut)"></span></div><div class="prog"><i id="pb"></i></div>
+<div class="acts"><button class="p" id="opt"></button><button id="addB"></button><div class="mn" id="mn"><button id="mnB" aria-haspopup="menu" aria-expanded="false" aria-controls="mnL"></button><div class="mnl" id="mnL" role="menu"><button class="mi" role="menuitem" id="tdet"></button><button class="mi" role="menuitem" id="dis"></button><button class="mi" role="menuitem" id="valAll"></button><hr><button class="mi" role="menuitem" id="dupT"></button><button class="mi" role="menuitem" id="expT"></button><hr><button class="mi ko" role="menuitem" id="rstT"></button><button class="mi ko" role="menuitem" id="clrT"></button></div></div></div>
+<div class="addp" id="addp" hidden><div class="adr"><input id="adA" type="text" placeholder="Adresse de livraison" aria-label="Adresse de livraison" autocomplete="street-address"><button type="button" id="adB" class="p">Rechercher</button></div><div id="adR" class="adres"></div></div>
+<div class="chips" id="sects" aria-label="Secteurs"></div>
+<div class="chips" id="flts" role="group" aria-label="Filtrer les livraisons"></div>
+<div id="list"></div></section>
+<section class="z3m"><div class="mw" id="mw"><div id="mbc"></div>
 <div class="tl"><button id="mAdd"></button></div>
 <div class="zc"><button class="ic" id="zi" data-ic="plus" aria-label="Zoom avant"></button><button class="ic" id="zo" data-ic="minus" aria-label="Zoom arrière"></button><button class="ic" id="zf" data-ic="max" aria-label="Recentrer"></button></div>
 <div class="msz" id="msz" role="group" aria-label="Taille de la carte"><button type="button" data-sz="s" aria-label="Carte réduite" title="Carte réduite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="8" rx="2"/></svg><span>Réduite</span></button><button type="button" data-sz="n" aria-label="Carte normale" title="Carte normale"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/></svg><span>Normale</span></button><button type="button" data-sz="f" aria-label="Carte plein écran" title="Carte plein écran"><svg id="mszI" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/><path d="M9 21H3v-6"/></svg><span>Plein écran</span></button></div>
-<div class="hint" id="hint"></div><div class="pop" id="pop"></div></div>
-<div class="chips" id="sects" aria-label="Secteurs"></div>
-<div class="chips" id="flts" role="group" aria-label="Filtrer les livraisons"></div>
-<div class="acts"><button class="p" id="opt"></button><button id="addB"></button><div class="mn" id="mn"><button id="mnB" aria-haspopup="menu" aria-expanded="false" aria-controls="mnL"></button><div class="mnl" id="mnL" role="menu"><button class="mi" role="menuitem" id="tdet"></button><button class="mi" role="menuitem" id="dis"></button><button class="mi" role="menuitem" id="valAll"></button><hr><button class="mi" role="menuitem" id="dupT"></button><button class="mi" role="menuitem" id="expT"></button><hr><button class="mi ko" role="menuitem" id="rstT"></button><button class="mi ko" role="menuitem" id="clrT"></button></div></div></div>
-</section>
-<section><div class="hd"><b>Livraisons</b><span id="pc" style="color:var(--mut)"></span></div><div class="prog"><i id="pb"></i></div><div id="list"></div></section>
+<div class="hint" id="hint"></div><div class="pop" id="pop"></div></div></section>
 </div>
 </main>
 <main id="dash"></main>
@@ -573,9 +584,9 @@ function draw(){
 }
 function fitAd(el){(el?[el]:[].slice.call(document.querySelectorAll('#list .ad'))).forEach(function(t){t.style.height='auto';t.style.height=t.scrollHeight+'px'})}
 $('#opt').onclick=function(){var b=this;if(b.disabled||todo(S.cur).length<2)return;b.disabled=true;b.innerHTML=I('loader','spin')+'Calcul en cours…';
- setTimeout(function(){var bf=len(todo(S.cur));opt(S.cur);save();draw();var sv=Math.max(0,bf-len(todo(S.cur)));b.innerHTML=I('check')+(sv>0.05?'Optimisée · −'+sv.toFixed(1)+' km':'Déjà optimale');
+ setTimeout(function(){var bf=len(todo(S.cur));opt(S.cur);save();draw();if(typeof rpApiOpt==='function')rpApiOpt(S.cur);var sv=Math.max(0,bf-len(todo(S.cur)));b.innerHTML=I('check')+(sv>0.05?'Optimisée · −'+sv.toFixed(1)+' km':'Déjà optimale');
   setTimeout(function(){b.disabled=false;draw()},1800)},500)};
-$('#dis').onclick=function(){dispatch();save();draw()};
+$('#dis').onclick=function(){dispatch();save();draw();if(typeof rpApiOptAll==='function')rpApiOptAll()};
 function clearTour(){var d=drv(S.cur),n=mine(S.cur).length;if(!d||!n)return;
  $('#sh').innerHTML='<div class="hh"><b>Effacer la tournée ?</b><button class="ic" id="cx" aria-label="Fermer">'+I('x')+'</button></div>'
  +'<p class="s" style="margin-top:12px">Les <b>'+n+' arrêt'+(n>1?'s':'')+'</b> de la tournée de <b>'+esc(d.name)+'</b> seront supprimés, y compris les livraisons déjà effectuées et leurs preuves. Cette action est irréversible.</p>'
@@ -841,7 +852,7 @@ function liveStats(){var R={nd:0,fl:0,td:0,km:0,kmR:0,late:0,risk:0,min:0,ll:[]}
   vi.forEach(function(q){km+=d(p,q);p=q});
   if(x.ended&&!t.length&&S.cfg.ret)km+=d(p,D);
   t.forEach(function(s){var dd=d(p,s),w=mins(s.w1),e=mins(s.w2);kr+=dd;tm+=dd/v*60;if(w!=null&&tm<w)tm=w;
-   if(e!=null){if(nw>e){R.late++;R.ll.push({q:s,x:x,m:nw-e,e:s.w2})}else if(tm>e)R.risk++}
+   if(e!=null){if(S.day<dk()||(S.day===dk()&&nw>e)){R.late++;R.ll.push({q:s,x:x,m:nw-e,e:s.w2})}else if(tm>e)R.risk++}
    tm+=S.cfg.svc;p=s});
   if(t.length&&S.cfg.ret)kr+=d(p,D);
   R.km+=km;R.kmR+=kr;R.min+=(km+kr)/v*60+S.cfg.svc*ms.length});
@@ -1193,6 +1204,119 @@ raf=requestAnimationFrame(frame);
 setTimeout(function(){if(done)return;tt.style.height=tt.offsetHeight+'px';var r=c.getBoundingClientRect();
  c.style.cssText='position:fixed;left:'+r.left+'px;top:'+r.top+'px;margin:0;transform-origin:0 0;transform:scale(1.35)';it.appendChild(c);it.classList.add('go');
  setTimeout(function(){if(done)return;var q=br.getBoundingClientRect();c.style.transition='transform .9s cubic-bezier(.6,0,.2,1)';c.style.transform='translate('+(q.left-r.left)+'px,'+(q.top-r.top)+'px) scale(1)';setTimeout(fin,1000)},60)},4600)}
+/* ===== Connexion à l’API RoutePilot (FastAPI + PostGIS + OR-Tools) ===== */
+var _persist=persist;persist=function(){_persist();rpSync()};
+var RPAPI=(function(){
+ var base=(window.RP_API_URL||'').replace(/\/$/,''),SK='rp_api_sess',sess=null;
+ try{var qp=new URLSearchParams(location.search).get('api');if(qp)localStorage.setItem('rp_api',qp.replace(/\/$/,''));if(!base)base=localStorage.getItem('rp_api')||''}catch(e){}
+ try{sess=JSON.parse(sessionStorage.getItem(SK)||'null')}catch(e){}
+ var o={base:base,sess:function(){return sess},
+  on:function(role){return !!(base&&sess&&sess.token&&(!role||sess.role===role))},
+  set:function(x){sess=x;try{x?sessionStorage.setItem(SK,JSON.stringify(x)):sessionStorage.removeItem(SK)}catch(e){}},
+  req:function(m,p,body,form){var h={},op={method:m,headers:h};
+   if(sess&&sess.token)h.Authorization='Bearer '+sess.token;
+   if(form)op.body=new URLSearchParams(form);else if(body){h['Content-Type']='application/json';op.body=JSON.stringify(body)}
+   return fetch(base+p,op).catch(function(){throw new Error('Serveur injoignable')}).then(function(r){
+    if(r.status===401&&sess&&p!=='/auth/login'){o.set(null);toast('Session expirée : reconnectez-vous');throw new Error('Session expirée')}
+    if(!r.ok)return r.json().catch(function(){return{}}).then(function(j){throw new Error(typeof j.detail==='string'?j.detail:'Erreur '+r.status)});
+    return r.status===204?null:r.json()})}};
+ return o})();
+var RPQ=Promise.resolve(),RPB={},RPPL=0,RP_SHIFT_END='20:00';
+function rpQ(job){var p=RPQ.then(job);RPQ=p.catch(function(){});return p}
+function rpSt(x){return x==='delivered'?'done':x==='failed'?'fail':'todo'}
+
+/* Connexion : e-mail + mot de passe (comptes de l’API) ; les identifiants locaux (ETP, M, R, E, L) restent utilisables */
+var _rpAcc=rpAcc;rpAcc=function(id){if(String(id||'').trim().toUpperCase()==='API'){var s=RPAPI.on()&&RPAPI.sess();return s?{id:'API',role:s.role,name:s.name}:null}return _rpAcc(id)};
+var _rpTry=rpTry;rpTry=function(){var id=$('#lgi').value.trim();if(RPAPI.base&&id.indexOf('@')>0){rpApiLogin(id,$('#lgp').value)}else _rpTry()};
+function rpApiLogin(email,pw){var er=$('#lge'),b=$('#lgb');er.textContent='';
+ if(!pw){er.textContent='Mot de passe requis.';$('#lgp').focus();return}
+ b.disabled=true;
+ RPAPI.req('POST','/auth/login',null,{username:email,password:pw}).then(function(t){RPAPI.set({token:t.access_token});return RPAPI.req('GET','/auth/me')}).then(function(u){
+  var role=u.role==='company'?'co':'dr';
+  if(RPTGT&&role!==RPTGT){RPAPI.set(null);throw new Error('Cet identifiant ne donne pas accès à l’espace '+(RPTGT==='co'?'entreprise':'chauffeur')+'.')}
+  RPAPI.set({token:RPAPI.sess().token,role:role,name:u.full_name,email:u.email});
+  if(S.apiUser!==u.email){S.apiUser=u.email;S.apiVeh=0;S.apiDepot='';S.drivers.forEach(function(d){d.api=0});S.stops.forEach(function(q){delete q.api})}
+  rpSet({id:'API',role:role,name:u.full_name});
+  er.textContent='';$('#lgi').value='';$('#lgp').value='';$('#login').classList.add('off');rpGo(RPTGT||role)
+ }).catch(function(e){RPAPI.set(null);er.textContent=e.message||'Connexion impossible.'}).then(function(){b.disabled=false})}
+(function(){if(!RPAPI.base)return;var i=$('#lgi'),pw=$('#lgp'),pl=$('#lgpl');$('#login .d').textContent='Saisissez votre identifiant ou votre e-mail pour accéder à votre espace.';
+ function t(){var em=i.value.indexOf('@')>0;pl.style.display=pw.style.display=em?'':'none'}
+ i.addEventListener('input',t);pw.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();rpTry()}});t()})();
+$('#lgo').addEventListener('click',function(){RPAPI.set(null)});
+
+/* Optimisation serveur : Mapbox Matrix + Google OR-Tools (résultat local affiché immédiatement, puis remplacé) */
+function rpOrdBody(q){var g=gps(q);return{delivery_date:q.day,client_name:q.name||'Client',address:q.addr||('Point GPS '+g[0]+', '+g[1]),phone:q.tel||null,instructions:q.ins||null,demand:1,service_minutes:S.cfg.svc||0,window_start:q.w1||null,window_end:q.w2||null,lat:g[0],lng:g[1]}}
+function rpOrder(q){var b=rpOrdBody(q);q.api=q.api||{};
+ var mk=function(){return RPAPI.req('POST','/orders',b).then(function(o){q.api.order=o.id})};
+ if(!q.api.order)return mk();
+ return RPAPI.req('PATCH','/orders/'+q.api.order,b).catch(function(e){if(/introuvable/i.test(e.message))return mk();throw e})}
+function rpDepot(){var g=gps(D),k=g[0]+','+g[1];if(S.apiDepot===k)return Promise.resolve();
+ return RPAPI.req('PUT','/company/depot',{lat:g[0],lng:g[1],address:'Dépôt'}).then(function(){S.apiDepot=k;_persist()})}
+function rpVeh(){if(S.apiVeh)return Promise.resolve(S.apiVeh);
+ return RPAPI.req('GET','/vehicles').then(function(L){var v=L.filter(function(x){return x.active})[0];if(v)return v;var l=S.vehicles[0]||{};
+  return RPAPI.req('POST','/vehicles',{plate:l.plate||'SANS-PLAQUE',brand:l.brand||null,model:l.model||null,capacity:1000})}).then(function(v){S.apiVeh=v.id;_persist();return v.id})}
+function rpDriverApi(dv){if(dv.api)return Promise.resolve(dv.api);
+ return RPAPI.req('GET','/drivers').then(function(L){var n=rpNorm(dv.name),m=L.filter(function(x){return rpNorm(x.name)===n})[0];if(m)return m;
+  return RPAPI.req('POST','/drivers',{name:dv.name,max_deliveries:S.cfg.max>0?S.cfg.max:200,work_start:S.start||'08:00',work_end:RP_SHIFT_END,phone:(dv.prof&&dv.prof.tel)||null})}).then(function(x){dv.api=x.id;_persist();return x.id})}
+function rpApiOpt(id){
+ if(!RPAPI.on('co'))return Promise.resolve();
+ var dv=drv(id),day=S.day;if(!dv||!todo(id).length)return Promise.resolve();
+ return rpQ(function(){
+  var T=todo(id);if(!T.length)return;var local=T.slice(),inT={};T.forEach(function(q){inT[q.id]=1});
+  toast('Optimisation serveur en cours…');
+  return Promise.all([rpDepot(),rpDriverApi(dv),rpVeh()]).then(function(r){
+   var rts={};T.forEach(function(q){if(q.api&&q.api.route)rts[q.api.route]=1});
+   return Promise.all(Object.keys(rts).map(function(k){return RPAPI.req('DELETE','/routes/'+k+'?pending_only=true').catch(function(){})})).then(function(){return r})
+  }).then(function(r){T.forEach(function(q){if(q.api)q.api.route=q.api.stop=0});return Promise.all(T.map(rpOrder)).then(function(){return r})
+  }).then(function(r){return RPAPI.req('POST','/planning/run',{date:day,driver_ids:[r[1]],vehicle_ids:[r[2]],order_ids:T.map(function(q){return q.api.order}),time_limit_s:5})
+  }).then(function(run){return Promise.all(run.routes.map(function(rt){return RPAPI.req('POST','/routes/'+rt.id+'/publish')})).then(function(){return run})
+  }).then(function(run){
+   var map={},ord=[],seen={};T.forEach(function(q){map[q.api.order]=q});
+   run.routes.forEach(function(rt){rt.stops.forEach(function(s){var q=map[s.order.id];if(q){q.api.route=rt.id;q.api.stop=s.id;q.api.st='todo';ord.push(q);seen[q.id]=1}})});
+   var r2=ord.concat(T.filter(function(q){return !seen[q.id]})),cur={};todo(id).forEach(function(q){cur[q.id]=1});
+   r2=r2.filter(function(q){return cur[q.id]});todo(id).forEach(function(q){if(!inT[q.id])r2.push(q)});
+   S.gain=S.gain||{};var gk=id+'_'+day;S.gain[gk]=Math.max(0,(S.gain[gk]||0)+len(local)-len(r2));
+   S.stops=S.stops.filter(function(s){return !(s.drv==id&&s.st==='todo'&&s.day===day)}).concat(r2);
+   save();draw();
+   var sm=run.summary||{},un=(sm.unassigned_order_ids||[]).length;
+   toast(un?un+' livraison(s) non planifiée(s) : créneau, capacité ou horaires à revoir':'Tournée optimisée par le serveur'+(sm.matrix_source==='estimation'?' (estimation, sans Mapbox)':''))
+  })
+ }).catch(function(e){if(/livreur|véhicule/i.test(e.message)){S.apiVeh=0;dv.api=0}toast('Serveur : '+(e.message||'indisponible')+' · résultat local conservé')})}
+function rpApiOptAll(){if(!RPAPI.on('co'))return;S.drivers.reduce(function(p,d){return p.then(function(){return rpApiOpt(d.id)})},Promise.resolve())}
+
+/* Remontée des livraisons et incidents vers le serveur */
+function rpSync(){if(!RPAPI.on())return;
+ S.stops.forEach(function(q){var a=q.api;if(!a||!a.route||!a.stop||q.st==='todo'||a.st===q.st||RPB[q.id]||(RPB[q.id+'e']||0)>=3)return;
+  var fail=q.st==='fail',r=String(q.reason||'').split(' – ')[0];if(fail&&INC.indexOf(r)<0)r=INM[r]||'Problème technique';
+  RPB[q.id]=1;
+  RPAPI.req('PATCH','/routes/'+a.route+'/stops/'+a.stop,{status:fail?'failed':'delivered',failure_reason:fail?r:null}).then(function(){a.st=q.st;RPB[q.id+'e']=0}).catch(function(){RPB[q.id+'e']=(RPB[q.id+'e']||0)+1}).then(function(){RPB[q.id]=0;_persist()})})}
+
+/* Entreprise : récupère les livraisons validées par les livreurs */
+function rpPoll(){if(!RPAPI.on('co'))return Promise.resolve();
+ return RPAPI.req('GET','/routes?date='+S.day).then(function(routes){var ch=false;
+  routes.forEach(function(r){r.stops.forEach(function(s){var q=S.stops.filter(function(z){return z.api&&z.api.stop===s.id})[0],st=rpSt(s.status);
+   if(q&&st!=='todo'&&q.st==='todo'){q.st=st;q.ts=s.delivered_at?Date.parse(s.delivered_at):Date.now();q.api.st=st;ch=true;if(st==='fail'){q.reason=s.failure_reason||'Problème technique';incAdd(q,q.reason,'','')}}})});
+  if(ch){_persist();if(document.body.classList.contains('cd'))dashRender();else draw()}}).catch(function(){})}
+
+/* Livreur : récupère les tournées publiées et la position du dépôt */
+function rpPull(){if(!RPAPI.on('dr')||RPPL)return Promise.resolve();RPPL=1;var d=me();
+ return Promise.all([RPAPI.req('GET','/routes/me?date='+S.day),RPAPI.req('GET','/company').catch(function(){return null})]).then(function(R){
+  var routes=R[0],c=R[1],ch=false,n=0,ord=[],seen={},sig=S.stops.map(function(z){return z.id}).join();
+  if(c&&c.depot_lat!=null){var p0=xy(c.depot_lat,c.depot_lng);if(!S.depot||Math.abs(S.depot.x-p0[0])>.5||Math.abs(S.depot.y-p0[1])>.5){D.x=p0[0];D.y=p0[1];S.depot={x:D.x,y:D.y};ch=true}}
+  routes.sort(function(a,b){return a.id-b.id});
+  routes.forEach(function(r){r.stops.slice().sort(function(a,b){return a.seq-b.seq}).forEach(function(s){
+   var o=s.order,st=rpSt(s.status),q=S.stops.filter(function(z){return z.api&&z.api.stop===s.id})[0];
+   if(!q){var p=xy(o.lat,o.lng);q={id:Date.now()+(n++),name:o.client_name,x:p[0],y:p[1],st:st,day:r.route_date,drv:d.id,addr:o.address,tel:o.phone||'',ins:o.instructions||'',w1:(o.window_start||'').slice(0,5),w2:(o.window_end||'').slice(0,5),api:{order:o.id,route:r.id,stop:s.id,st:st}};S.stops.push(q);ch=true}
+   else if(q.st==='todo'&&st!=='todo'){q.st=st;q.ts=Date.now();q.api.st=st;ch=true}
+   seen[s.id]=1;ord.push(q)})});
+  if(DP!=='deliv')S.stops=S.stops.filter(function(z){return !(z.api&&z.api.stop&&z.drv==d.id&&z.day===S.day&&z.st==='todo'&&!seen[z.api.stop])});
+  var inO={};ord.forEach(function(q){inO[q.id]=1});S.stops=S.stops.filter(function(z){return !inO[z.id]}).concat(ord);
+  if(ch||sig!==S.stops.map(function(z){return z.id}).join()){_persist();if(DP!=='deliv'&&document.body.classList.contains('dv'))drvRender()}
+ }).catch(function(){}).then(function(){RPPL=0})}
+var _rpOpenDr=rpOpenDr;rpOpenDr=function(){_rpOpenDr();rpPull()};
+var _rpOpenCo=rpOpenCo;rpOpenCo=function(){_rpOpenCo();rpPoll()};
+setInterval(function(){if(document.hidden||!RPAPI.on())return;rpSync();if(RPAPI.on('co'))rpPoll();else rpPull()},15000);
+
 var RPAUTH='',RPKEY='rp_auth',RPTGT='';
 function rpNorm(t){return String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()}
 function rpAcc(id){id=String(id||'').trim().toUpperCase();if(id==='ETP')return{id:id,role:'co'};var m={M:'Matéo',R:'Romain',E:'Elliot',L:'Livreur'};return m[id]?{id:id,role:'dr',name:m[id]}:null}
@@ -1220,6 +1344,82 @@ window.addEventListener('resize',draw);
 draw();
 $('#sects').addEventListener('click',function(e){if(e.target.dataset.sc)goSector(e.target.dataset.sc)});
 $('#flts').addEventListener('click',function(e){var b=e.target.closest('[data-fk]');if(b)setFlt(b.dataset.fk)});sectRender();mbBoot();
+
+/* Ajout d'une livraison par adresse : la carte reste en lecture */
+(function(){var P=document.getElementById('addp'),A=document.getElementById('adA');
+function t(){P.hidden=!P.hidden;if(!P.hidden)A.focus()}
+$('#mAdd').onclick=t;$('#addB').onclick=t;
+A.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();document.getElementById('adB').click()}};
+geoAttach('adA','adR','adB',function(f){var p=xy(f.center[1],f.center[0]);add(+p[0].toFixed(2),+p[1].toFixed(2));var q=S.stops[S.stops.length-1];q.addr=f.place_name;save();A.value='';P.hidden=true;draw()});
+})();
+
+/* Simulation (espace entreprise) : 50 livraisons fictives à faire, supprimables en un clic */
+(function(){
+var N=50,F=window.RPFake,PK=[[-260,-170,70,45],[210,-120,55,55],[-60,150,45,30],[330,110,80,50]];
+var FN=['Sophie','Lucas','Camille','Thomas','Emma','Hugo','Léa','Nathan','Chloé','Maxime','Inès','Antoine','Manon','Julien','Sarah','Pierre','Clara','Alexandre','Jade','Mathis','Louise','Romain','Anaïs','Baptiste','Océane','Théo','Margaux','Quentin','Élodie','Guillaume'];
+var LN=['Martin','Bernard','Dubois','Moreau','Laurent','Simon','Michel','Lefebvre','Garcia','Roux','Fournier','Girard','Perrin','Vidal','Mercier','Blanc','Guérin','Faure','Rousseau','Chevalier','Masson','Gautier','Nicolas','Lopez','Bonnet','Arnaud','Clément','Morel','André','Lambert'];
+var BZ=['Boulangerie','Pharmacie','Librairie','Fleuriste','Cabinet','Atelier','Optique','Café','Cave','Institut'];
+var BS=['des Brotteaux','de la Soie','Saint-Jean','Gambetta','du Rhône','Lafayette','Garibaldi','des Canuts','Vendôme','Part-Dieu'];
+var IN=['Sonner à l’interphone, 2e étage','Laisser le colis chez le gardien','Code porte : 4812A','Appeler 5 min avant l’arrivée','Remise en main propre uniquement','Colis volumineux, prévoir le diable','Livrer à l’accueil','Dépôt chez un voisin accepté','Fragile : manipuler avec précaution','','',''];
+function r(){return Math.random()}
+function pick(a){return a[Math.floor(r()*a.length)]}
+function p2(){return ('0'+Math.floor(r()*100)).slice(-2)}
+function inPark(u,v){return PK.some(function(p){var a=(u-p[0])/(p[2]+8),b=(v-p[1])/(p[3]+8);return a*a+b*b<1})}
+function pos(used){
+ for(var t=0;t<300;t++){var u,v;
+  if(r()<.5){u=F.gu(Math.round(-9+r()*18));v=-205+r()*350}else{v=F.gv(Math.round(-8+r()*13));u=-275+r()*550}
+  if(v>165||v<-215||inPark(u,v))continue;
+  var p=F.uv2xy(u,v),x=+p[0].toFixed(2),y=+p[1].toFixed(2);
+  if(used.some(function(q){return Math.abs(q[0]-x)<9&&Math.abs(q[1]-y)<9}))continue;
+  used.push([x,y]);return[x,y]}
+ return[+(300+(r()-.5)*400).toFixed(2),+(200+(r()-.5)*250).toFixed(2)]}
+function ensureDrivers(){
+ ['Matéo','Romain','Elliot'].forEach(function(nm,k){if(S.drivers.length>=3)return;
+  if(S.drivers.some(function(d){return rpNorm(d.name)===rpNorm(nm)}))return;
+  var u=S.drivers.map(function(d){return d.c}),c=P.filter(function(z){return u.indexOf(z)<0})[0]||P[S.drivers.length%P.length];
+  S.drivers.push({id:Date.now()+k,name:nm,c:c})});
+ while(S.drivers.length<3){var k=S.drivers.length+1;S.drivers.push({id:Date.now()+50+k,name:'Livreur '+k,c:P[S.drivers.length%P.length]})}}
+function gen(){
+ ensureDrivers();
+ var used=[],base=Date.now(),nowm=nowM(),today=S.day===dk(),nd=S.drivers.length,L=[],i;
+ for(i=0;i<N;i++){
+  var xy=pos(used),biz=r()<.35,nm=biz?pick(BZ)+' '+pick(BS):pick(FN)+' '+pick(LN);
+  L.push({id:base+i*17,name:nm,x:xy[0],y:xy[1],st:'todo',day:S.day,drv:0,addr:F.addr(xy[0],xy[1]),
+   tel:biz?'04 72 '+p2()+' '+p2()+' '+p2():'06 '+p2()+' '+p2()+' '+p2()+' '+p2(),ins:pick(IN),w1:'',w2:'',sim:1})}
+ S.n+=N;
+ L.sort(function(a,b){return Math.atan2(a.y-D.y,a.x-D.x)-Math.atan2(b.y-D.y,b.x-D.x)});
+ S.drivers.forEach(function(dv,k){
+  var ch=L.slice(Math.floor(k*N/nd),Math.floor((k+1)*N/nd));
+  ch.forEach(function(q){q.drv=dv.id});
+  sim(ch);
+  ch.forEach(function(q){
+   if(r()<.55){var lo=Math.floor(q.eta/60)*60,hi=lo+120;if(lo>=1140||(today&&hi<=nowm))return;q.w1=hm(lo);q.w2=hm(hi)}});
+  sim(ch);
+  delete S.base[dv.id]});
+ L.forEach(function(q){delete q.eta;delete q.late});
+ S.stops=S.stops.concat(L);S.sel=null;save();
+ toast(N+' livraisons fictives ajoutées · '+nd+' livreurs')}
+function rm(){var ids={};S.stops.forEach(function(q){if(q.sim)ids[q.id]=1});
+ S.stops=S.stops.filter(function(q){return !ids[q.id]});S.incidents=S.incidents.filter(function(z){return !ids[z.sid]});
+ S.base={};S.sel=null;save();toast('Simulation supprimée')}
+function ask(){
+ var day=dl(S.day).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}),n=Math.max(3,S.drivers.length),ex=S.stops.filter(function(q){return q.sim&&q.day===S.day}).length;
+ $('#sh').innerHTML='<div class="hh"><b>Simuler 50 livraisons ?</b><button class="ic" id="cx" aria-label="Fermer">'+I('x')+'</button></div>'
+ +'<p class="s" style="margin-top:12px">50 livraisons fictives <b>à faire</b> sont ajoutées au <b>'+day+'</b> : clients, adresses et téléphones inventés, créneaux horaires sur une partie des arrêts, réparties par secteur entre <b>'+n+' livreurs</b> (Matéo, Romain et Elliot sont créés s’il manque des livreurs). Les arrêts déjà présents sont conservés.'+(ex?' <b>'+ex+'</b> livraison'+(ex>1?'s':'')+' de simulation existe'+(ex>1?'nt':'')+' déjà à cette date.':'')+'</p>'
+ +'<div class="bar2"><button class="p big" id="sm_ok">'+I('zap')+'Générer</button><button class="big" id="sm_no">Annuler</button></div>';
+ $('#ov').classList.add('on');$('#cx').onclick=close;$('#sm_no').onclick=close;$('#sm_ok').onclick=function(){close();gen()}}
+function askRm(){
+ var n=S.stops.filter(function(q){return q.sim}).length;
+ $('#sh').innerHTML='<div class="hh"><b>Supprimer la simulation ?</b><button class="ic" id="cx" aria-label="Fermer">'+I('x')+'</button></div>'
+ +'<p class="s" style="margin-top:12px">Les <b>'+n+' livraison'+(n>1?'s':'')+' fictive'+(n>1?'s':'')+'</b> (toutes dates) et leurs incidents sont supprimées. Vos autres livraisons et vos livreurs ne sont pas touchés.</p>'
+ +'<div class="bar2"><button class="ko big" id="sm_ok">'+I('trash')+'Supprimer</button><button class="big" id="sm_no">Annuler</button></div>';
+ $('#ov').classList.add('on');$('#cx').onclick=close;$('#sm_no').onclick=close;$('#sm_ok').onclick=function(){close();rm()}}
+function btns(){var b=document.querySelector('#dash .dh .ba');if(!b||b.querySelector('#simGo'))return;
+ b.insertAdjacentHTML('beforeend','<button type="button" id="simGo">'+I('zap')+'Simuler 50 livraisons</button>'+(S.stops.some(function(q){return q.sim})?'<button type="button" id="simRm" class="ko">'+I('trash')+'Supprimer la simulation</button>':''))}
+var _d=dashRender;dashRender=function(){var x=_d.apply(this,arguments);btns();return x};
+$('#dash').addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('#simGo,#simRm');if(!b)return;if(b.id==='simGo')ask();else askRm()});
+if(document.body.classList.contains('cd'))dashRender();
+})();
 </script>
 </body>
 </html>
